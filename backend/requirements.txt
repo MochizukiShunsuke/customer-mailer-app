@@ -1,0 +1,6 @@
+# backend/requirements.txt
+
+Flask
+Flask-Cors
+Flask-SQLAlchemy
+mysql-connector-python

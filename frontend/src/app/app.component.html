@@ -1,0 +1,185 @@
+<!-- frontend/src/app/app.component.html -->
+<div class="container mx-auto p-4 sm:p-8 font-sans">
+
+    <header class="mb-12 text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">顧客管理・メール送信システム</h1>
+        <p class="text-gray-600 mt-2">顧客の管理とパーソナライズメールの一斉送信を行います。</p>
+    </header>
+
+    <!-- ★★★ ここからが全体のメインコンテンツ ★★★ -->
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+        <!-- 左側のカラム -->
+        <div class="space-y-8">
+
+            <!-- 顧客管理 -->
+            <section class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">顧客管理</h2>
+
+                <!-- 新規顧客追加フォーム -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-medium mb-4">新規顧客の追加</h3>
+                    <form (ngSubmit)="addCustomer()" #customerForm="ngForm" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">名前:</label>
+                            <input type="text" id="name" name="name" [(ngModel)]="newCustomer.name" required
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス:</label>
+                            <input type="email" id="email" name="email" [(ngModel)]="newCustomer.email" required email
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <button type="submit" [disabled]="!customerForm.form.valid"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300">
+                            顧客を追加
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 顧客リスト -->
+                <div>
+                    <h3 class="text-xl font-medium mb-4">顧客リスト ({{ customers.length }}人)</h3>
+                    <div class="max-h-96 overflow-y-auto">
+                        <ul class="divide-y divide-gray-200">
+                            <li *ngFor="let customer of customers" class="py-3 flex justify-between items-center">
+                                <div>
+                                    <p class="text-md font-medium text-gray-900">{{ customer.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ customer.email }}</p>
+                                </div>
+                                <button (click)="deleteCustomer(customer.id)"
+                                    class="ml-4 px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    削除
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </div> <!-- 左側のカラムここまで -->
+
+        <!-- 右側のカラム -->
+        <div class="space-y-8">
+
+            <!-- 送信元設定 -->
+            <section class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">送信元設定 (Gmail)</h2>
+                <form (ngSubmit)="saveSettings()" #settingsForm="ngForm" class="space-y-4">
+                    <div>
+                        <label for="sender_email" class="block text-sm font-medium text-gray-700">送信元メールアドレス:</label>
+                        <input type="email" id="sender_email" name="sender_email" [(ngModel)]="settings.sender_email"
+                            required
+                            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="sender_password" class="block text-sm font-medium text-gray-700">アプリパスワード:</label>
+                        <input type="password" id="sender_password" name="sender_password"
+                            [(ngModel)]="settings.sender_password" required
+                            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <button type="submit" [disabled]="!settingsForm.form.valid"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300">
+                        送信元を保存
+                    </button>
+                </form>
+            </section>
+
+            <!-- メールテンプレート編集 -->
+            <section class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">メール内容</h2>
+                <!-- 添付ファイルUI -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-medium mb-4">ファイル添付</h3>
+                    <div
+                        class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                viewBox="0 0 48 48" aria-hidden="true">
+                                <path
+                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="file-upload"
+                                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                    <span>ファイルを選択</span>
+                                    <input id="file-upload" name="file-upload" type="file" class="sr-only"
+                                        (change)="onFileSelected($event)">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500" *ngIf="!selectedFile">PDF, PNG, JPG, XLSXなど</p>
+                            <p class="text-sm font-medium text-green-600" *ngIf="selectedFile">{{ selectedFile.name }}
+                            </p>
+                        </div>
+                    </div>
+                    <button (click)="onUpload()" [disabled]="!selectedFile"
+                        class="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:bg-yellow-300">
+                        アップロード
+                    </button>
+                </div>
+                <!-- テンプレート編集フォーム -->
+                <div>
+                    <h3 class="text-xl font-medium mb-4">メールテンプレート編集</h3>
+                    <p class="text-sm text-gray-500 mb-4">本文中の <code
+                            class="bg-gray-200 text-red-600 p-1 rounded">{{ '{' }}name{{ '}' }}</code> は自動で顧客名に置き換わります。
+                    </p>
+                    <form (ngSubmit)="updateTemplate()" #templateForm="ngForm" class="space-y-4">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700">件名:</label>
+                            <input type="text" id="title" name="title" [(ngModel)]="template.title" required
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label for="body" class="block text-sm font-medium text-gray-700">本文:</label>
+                            <textarea id="body" name="body" [(ngModel)]="template.body" required rows="6"
+                                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+                        <button type="submit" [disabled]="!templateForm.form.valid"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300">
+                            テンプレートを保存
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 一斉送信実行 -->
+            <section class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">一斉送信の実行</h2>
+                <div *ngIf="currentAttachment" class="mb-4 p-3 bg-gray-100 rounded-md text-sm">
+                    現在の添付ファイル: <span class="font-semibold">{{ currentAttachment }}</span>
+                </div>
+                <p class="text-gray-600 mb-4">現在の顧客リスト全員 ({{ customers.length }}人) に上記の内容でメールを送信します。</p>
+                <button (click)="sendEmails()" [disabled]="sending"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-300">
+                    <span *ngIf="!sending">全員に送信を実行</span>
+                    <span *ngIf="sending">送信中...</span>
+                </button>
+            </section>
+
+        </div> <!-- 右側のカラムここまで -->
+
+    </main> <!-- ★★★ 全体のメインコンテンツここまで ★★★ -->
+
+    <!-- 通知エリア -->
+    <div *ngIf="notification.message"
+        class="fixed bottom-5 right-5 max-w-sm w-full shadow-lg rounded-lg pointer-events-auto"
+        [ngClass]="{'bg-green-500': notification.type === 'success', 'bg-red-500': notification.type === 'error'}">
+        <div class="rounded-lg shadow-xs overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p class="text-sm font-medium text-white">{{ notification.message }}</p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button (click)="notification.message = ''" class="inline-flex text-white focus:outline-none">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<router-outlet></router-outlet>

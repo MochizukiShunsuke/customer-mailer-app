@@ -1,0 +1,47 @@
+# docker-compose.yml
+
+services:
+  # ... (frontendサービスは変更なし)
+  frontend:
+    build: ./frontend
+    container_name: golf-app-frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+
+  # ... (backendサービスを修正)
+  backend:
+    build: ./backend
+    container_name: golf-app-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/src:/app/src
+      # ★★★ この一行を追加 ★★★
+      # PC上の ./backend/uploads を、コンテナ内の /app/uploads に繋ぐ
+      - ./backend/uploads:/app/uploads
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+
+  # ... (dbサービスは変更なし)
+  db:
+    image: mysql:8.0
+    container_name: golf-app-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: golf_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db-data:

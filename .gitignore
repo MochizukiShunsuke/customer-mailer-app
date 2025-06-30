@@ -1,0 +1,67 @@
+# .gitignore
+
+# --- Operating System Files ---
+.DS_Store
+Thumbs.db
+
+# --- Python ---
+# Byte-compiled / optimized / C extensions
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak
+venv.bak
+
+# --- Node.js / Angular ---
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Angular cache files
+.angular/
+
+# --- Docker ---
+# Ignore docker-compose override files
+docker-compose.override.yml
+
+# --- VS Code ---
+.vscode/
+
+# --- Custom ---
+# Ignore backend env file
+backend/.env
+
+# Ignore backend uploads folder
+backend/uploads/
